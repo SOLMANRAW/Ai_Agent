@@ -22,6 +22,7 @@ A comprehensive AI assistant that can search files, manage emails, process voice
 - Telegram Bot Token
 - Gemini API Key (for online mode)
 
+
 ### Installation
 
 1. **Clone the repository**:
@@ -139,6 +140,26 @@ WHISPER_CPP_PATH=./whisper.cpp
 - "System status"
 - "Help"
 
+### Examples
+
+```
+User: "Search for my resume"
+Bot: "Found 2 files:
+1. resume.pdf (245KB) - /home/user/Documents/resume.pdf
+2. resume_updated.pdf (312KB) - /home/user/Downloads/resume_updated.pdf"
+
+User: "Check emails"
+Bot: "Recent emails:
+1. From: john@example.com
+   Subject: Meeting Tomorrow
+   Date: 2024-01-15
+   Snippet: Hi, let's meet tomorrow at 2 PM..."
+
+User: "What's the weather like?"
+Bot: "I don't have access to real-time weather data, but I can help you with file searches, emails, and other tasks!"
+```
+
+>>>>>>> 252d052 (Add comprehensive AI agent with Telegram bot, OpenAI/HuggingFace integration, file search, and voice recognition)
 ## 🏗️ Architecture
 
 ```
@@ -248,3 +269,4 @@ If you encounter any issues or have questions:
 ---
 
 **ENJOY**
+
