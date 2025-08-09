@@ -1,13 +1,13 @@
 # 🤖 AI Agent
 
-A comprehensive AI assistant that can search files, manage emails, process voice commands, and run both online (OpenAI) and offline (Ollama) language models.
+A comprehensive AI assistant that can search files, manage emails, process voice commands, and run both online (Gemini) and offline (Ollama) language models.
 
 ## ✨ Features
 
 - **🔍 File Search**: Search for files across your device with natural language
 - **📧 Email Management**: Read and send emails through Gmail integration
 - **🎤 Voice Recognition**: Process voice commands using Whisper.cpp
-- **🤖 Dual LLM Support**: Toggle between OpenAI (online) and Ollama Mistral 7B (offline)
+- **🤖 Dual LLM Support**: Toggle between Gemini (online) and Ollama Mistral 7B (offline)
 - **📱 Telegram Bot**: Interact via Telegram with voice and text messages
 - **⌨️ Hotkey Activation**: Global hotkey (Ctrl+Alt+A) for voice input
 - **🔒 Privacy**: Run completely offline with local models
@@ -20,7 +20,7 @@ A comprehensive AI assistant that can search files, manage emails, process voice
 - Git
 - Ollama (for offline mode)
 - Telegram Bot Token
-- OpenAI API Key (for online mode)
+- Gemini API Key (for online mode)
 
 ### Installation
 
@@ -139,30 +139,11 @@ WHISPER_CPP_PATH=./whisper.cpp
 - "System status"
 - "Help"
 
-### Examples
-
-```
-User: "Search for my resume"
-Bot: "Found 2 files:
-1. resume.pdf (245KB) - /home/user/Documents/resume.pdf
-2. resume_updated.pdf (312KB) - /home/user/Downloads/resume_updated.pdf"
-
-User: "Check emails"
-Bot: "Recent emails:
-1. From: john@example.com
-   Subject: Meeting Tomorrow
-   Date: 2024-01-15
-   Snippet: Hi, let's meet tomorrow at 2 PM..."
-
-User: "What's the weather like?"
-Bot: "I don't have access to real-time weather data, but I can help you with file searches, emails, and other tasks!"
-```
-
 ## 🏗️ Architecture
 
 ```
 AI Agent
-├── LLM Manager (OpenAI/Ollama)
+├── LLM Manager (Gemini/Ollama)
 ├── Speech Recognition (Whisper.cpp)
 ├── File Search Module
 ├── Email Manager (Gmail)
@@ -172,7 +153,7 @@ AI Agent
 
 ### Modules
 
-- **`llm_manager.py`**: Handles OpenAI and Ollama integration
+- **`llm_manager.py`**: Handles Gemini and Ollama integration
 - **`speech_recognition.py`**: Whisper.cpp integration for voice transcription
 - **`file_search.py`**: File system search and management
 - **`email_manager.py`**: Gmail API integration
@@ -252,7 +233,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - [Whisper.cpp](https://github.com/ggerganov/whisper.cpp) for speech recognition
 - [Ollama](https://ollama.ai) for local LLM inference
-- [OpenAI](https://openai.com) for GPT models
+- [Gemini](https://console.cloud.google.com) for GPT models
 - [python-telegram-bot](https://python-telegram-bot.readthedocs.io/) for Telegram integration
 
 ## 📞 Support
@@ -266,4 +247,4 @@ If you encounter any issues or have questions:
 
 ---
 
-**Happy AI Assisting! 🤖✨**
+**ENJOY**
