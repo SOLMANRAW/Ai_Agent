@@ -6,6 +6,7 @@ Run this in your terminal: python3 start_agent.py
 
 import sys
 import os
+import asyncio
 
 def main():
     print("🤖 Starting AI Agent...")
@@ -43,34 +44,37 @@ def main():
         config = Config()
         print("✅ Configuration loaded")
         
-        if config.TELEGRAM_TOKEN:
+        if config.get('TELEGRAM_TOKEN'):
             print("✅ Telegram token set")
         else:
             print("❌ Telegram token missing")
             
-        if config.OPENAI_API_KEY:
+        if config.get('OPENAI_API_KEY'):
             print("✅ OpenAI API key set")
         else:
             print("❌ OpenAI API key missing")
         
         # Test Whisper
         print("\n🎤 Testing Whisper.cpp...")
-        if os.path.exists(config.WHISPER_EXECUTABLE):
+        whisper_exec = config.get('WHISPER_EXECUTABLE', 'whisper.cpp/build/main')
+        if os.path.exists(whisper_exec):
             print("✅ Whisper executable found")
         else:
-            print(f"❌ Whisper executable not found: {config.WHISPER_EXECUTABLE}")
+            print(f"❌ Whisper executable not found: {whisper_exec}")
         
-        if os.path.exists(config.WHISPER_MODEL_PATH):
+        whisper_model = config.get('WHISPER_MODEL_PATH', 'models/ggml-large-v3-turbo-q5_0.bin')
+        if os.path.exists(whisper_model):
             print("✅ Whisper model found")
         else:
-            print(f"❌ Whisper model not found: {config.WHISPER_MODEL_PATH}")
+            print(f"❌ Whisper model not found: {whisper_model}")
         
         print("\n🎉 All tests passed! Starting AI Agent...")
         print("=" * 40)
         
         # Start the agent
-        from ai_agent import main as agent_main
-        agent_main()
+        from ai_agent import AIAgent
+        agent = AIAgent()
+        asyncio.run(agent.start())
         
     except ImportError as e:
         print(f"❌ Import error: {e}")

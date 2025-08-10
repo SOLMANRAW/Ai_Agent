@@ -9,12 +9,9 @@ class Config:
     TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
     TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
     
-    # OpenAI Configuration
-    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-    OPENAI_MODEL = "gpt-3.5-turbo"
-    
-    # Hugging Face Configuration (Free API)
-    HUGGINGFACE_TOKEN = os.getenv('HUGGINGFACE_TOKEN')
+    # Gemini Configuration
+    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+    GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-1.5-flash')
     
     # Ollama Configuration
     OLLAMA_BASE_URL = os.getenv('OLLAMA_BASE_URL', 'http://localhost:11434')
@@ -43,7 +40,7 @@ class Config:
     ]
     
     # Agent Configuration
-    DEFAULT_MODE = "huggingface"  # "online", "offline", or "huggingface"
+    DEFAULT_MODE = "gemini"  # Use Google Gemini
     MAX_FILE_SEARCH_RESULTS = 10
     MAX_EMAIL_RESULTS = 5
     
@@ -51,6 +48,10 @@ class Config:
     AUDIO_SAMPLE_RATE = 16000
     AUDIO_CHANNELS = 1
     AUDIO_FORMAT = "wav"
+    
+    def get(self, key, default=None):
+        """Get configuration value with optional default"""
+        return getattr(self, key, default)
     
     @classmethod
     def validate(cls):

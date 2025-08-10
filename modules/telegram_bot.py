@@ -9,26 +9,28 @@ import asyncio
 logger = logging.getLogger(__name__)
 
 class TelegramBot:
-    def __init__(self, config, ai_agent):
+    def __init__(self, config, llm_manager, email_manager=None):
         self.config = config
-        self.ai_agent = ai_agent
+        self.llm_manager = llm_manager
+        self.email_manager = email_manager
         self.application = None
         self._setup_bot()
     
     def _setup_bot(self):
         """Setup Telegram bot"""
-        if not self.config.TELEGRAM_TOKEN:
+        if not self.config.get('TELEGRAM_TOKEN'):
             logger.error("Telegram token not configured")
             return
         
         try:
-            self.application = Application.builder().token(self.config.TELEGRAM_TOKEN).build()
+            self.application = Application.builder().token(self.config.get('TELEGRAM_TOKEN')).build()
             
             # Add handlers
             self.application.add_handler(CommandHandler("start", self._start_command))
             self.application.add_handler(CommandHandler("help", self._help_command))
             self.application.add_handler(CommandHandler("mode", self._mode_command))
             self.application.add_handler(CommandHandler("status", self._status_command))
+            self.application.add_handler(CommandHandler("send", self._send_email_command))
             
             # Add message handlers
             self.application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self._handle_text))
@@ -40,172 +42,139 @@ class TelegramBot:
             logger.error(f"Error setting up Telegram bot: {e}")
     
     async def _start_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle /start command"""
         welcome_message = (
-            "🤖 Hello! I'm your AI Assistant.\n\n"
-            "I can help you with:\n"
-            "• File search and management\n"
-            "• Email reading and sending\n"
-            "• Voice and text processing\n"
-            "• General questions and tasks\n\n"
-            "Send me a message or voice note to get started!\n\n"
-            "Commands:\n"
-            "/help - Show this help\n"
-            "/mode - Switch between online/offline\n"
-            "/status - Check system status"
+            "🤖 Hello Sol! I'm your AI Assistant.\n\n\n"
+            "I am designed to help you with your daily tasks and answer any questions you have.\n\n You can use me both with online and offline mode.\n\n Use /help to view the help menu.\n\n\n"  
+            "Is there anything I can help you with?"
         )
         await update.message.reply_text(welcome_message)
     
     async def _help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle /help command"""
         help_message = (
-            "📚 **AI Assistant Help**\n\n"
-            "**Text Commands:**\n"
-            "• Ask questions or give instructions\n"
-            "• 'Search for file X' - Find files\n"
-            "• 'Check emails' - Read recent emails\n"
-            "• 'Send email to X' - Compose email\n\n"
-            "**Voice Commands:**\n"
-            "• Send voice messages for hands-free operation\n"
-            "• Voice will be transcribed and processed\n\n"
-            "**System Commands:**\n"
-            "/mode online - Use OpenAI\n"
-            "/mode offline - Use local Ollama\n"
-            "/status - System status\n"
-            "/help - This help\n\n"
-            "**Examples:**\n"
-            "• 'Find all PDF files'\n"
-            "• 'Show recent emails'\n"
-            "• 'Send email to john@example.com'\n"
-            "• 'What's the weather like?'"
+            "📚 Help\n\n\n"
+            "You can ask me anything with text or voice.\n\n"
+            "/start: To start the AI assistant\n\n"
+            "/status: To check the status of the AI\n\n"
+            "/mode online|offline: To toggle between online and offline AI mode\n\n"
+            "/help: To view the help menu\n\n"
+            "/send mrx@example.com Subject | body: Use this format to send an email\n\n"
+            
+            
         )
-        await update.message.reply_text(help_message, parse_mode='Markdown')
+        await update.message.reply_text(help_message)
     
     async def _mode_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle /mode command"""
         if not context.args:
-            current_mode = self.ai_agent.llm_manager.current_mode
-            await update.message.reply_text(f"Current mode: {current_mode}\nUse: /mode online or /mode offline")
+            current_mode = self.llm_manager.current_mode
+            await update.message.reply_text(f"Current mode: {current_mode}")
             return
-        
         mode = context.args[0].lower()
-        if mode not in ["online", "offline"]:
-            await update.message.reply_text("Invalid mode. Use 'online' or 'offline'")
-            return
-        
-        try:
-            self.ai_agent.llm_manager.set_mode(mode)
-            await update.message.reply_text(f"✅ Switched to {mode} mode")
-        except Exception as e:
-            await update.message.reply_text(f"❌ Error switching mode: {str(e)}")
+        resp = self.llm_manager.switch_mode(mode)
+        await update.message.reply_text(resp)
     
     async def _status_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle /status command"""
-        status = self.ai_agent.get_system_status()
-        await update.message.reply_text(status)
+        status = self.llm_manager.get_status()
+        txt = f"Current Mode: {status['current_mode']}\nStatus: {'working' if status.get('gemini_available') else 'not working'}"
+        await update.message.reply_text(txt)
+
+    async def _send_email_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        if not self.email_manager or not self.email_manager.service:
+            await update.message.reply_text("❌ Email not configured. Complete Gmail OAuth first.")
+            return
+        try:
+            args_text = (update.message.text or '').split(' ', 1)
+            if len(args_text) < 2:
+                await update.message.reply_text("Usage: /send to@example.com Subject | body")
+                return
+            payload = args_text[1].strip()
+            # Expect: to@example.com Subject | body
+            if ' ' not in payload or '|' not in payload:
+                await update.message.reply_text("Usage: /send to@example.com Subject | body")
+                return
+            to_part, rest = payload.split(' ', 1)
+            subject_part, body_part = [s.strip() for s in rest.split('|', 1)]
+            ok = self.email_manager.send_email(to=to_part, subject=subject_part, body=body_part)
+            await update.message.reply_text("✅ Email sent" if ok else "❌ Failed to send email")
+        except Exception as e:
+            logger.error(f"Error sending email: {e}")
+            await update.message.reply_text("❌ Error sending email")
     
     async def _handle_text(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle text messages"""
         try:
-            user_message = update.message.text
-            user_id = update.effective_user.id
-            
-            # Check if user is authorized
-            if self.config.TELEGRAM_CHAT_ID and str(user_id) != self.config.TELEGRAM_CHAT_ID:
-                await update.message.reply_text("❌ Unauthorized access")
+            chat_id = str(update.effective_chat.id)
+            allowed = self.config.get('TELEGRAM_CHAT_ID')
+            if allowed and chat_id != allowed:
+                await update.message.reply_text("❌ Unauthorized user")
                 return
-            
-            logger.info(f"Received text message from {user_id}: {user_message}")
-            
-            # Send typing indicator
-            await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
-            
-            # Process with AI agent
-            response = await self.ai_agent.process_text_message(user_message)
-            
-            # Send response
+            user_message = update.message.text
+            response = self.llm_manager.get_response(user_message, chat_id)
             await update.message.reply_text(response)
-            
         except Exception as e:
-            logger.error(f"Error handling text message: {e}")
-            await update.message.reply_text(f"❌ Error processing message: {str(e)}")
+            logger.error(f"Error handling text: {e}")
+            await update.message.reply_text("❌ Error processing message")
     
     async def _handle_voice(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Handle voice messages"""
         try:
-            user_id = update.effective_user.id
-            
-            # Check if user is authorized
-            if self.config.TELEGRAM_CHAT_ID and str(user_id) != self.config.TELEGRAM_CHAT_ID:
-                await update.message.reply_text("❌ Unauthorized access")
+            chat_id = str(update.effective_chat.id)
+            allowed = self.config.get('TELEGRAM_CHAT_ID')
+            if allowed and chat_id != allowed:
+                await update.message.reply_text("❌ Unauthorized user")
                 return
-            
             voice: Voice = update.message.voice
-            logger.info(f"Received voice message from {user_id}")
-            
-            # Send typing indicator
-            await context.bot.send_chat_action(chat_id=update.effective_chat.id, action="typing")
-            
-            # Download voice file
-            voice_file = await context.bot.get_file(voice.file_id)
-            
-            # Create temporary file
-            with tempfile.NamedTemporaryFile(suffix='.ogg', delete=False) as temp_file:
-                await voice_file.download_to_drive(temp_file.name)
-                temp_path = temp_file.name
-            
-            try:
-                # Transcribe voice message
-                transcription = self.ai_agent.speech_recognition.transcribe_voice_message(temp_path)
-                
-                if transcription and transcription != "Error transcribing voice message":
-                    # Send transcription
-                    await update.message.reply_text(f"🎤 **Transcription:** {transcription}")
-                    
-                    # Process with AI agent
-                    response = await self.ai_agent.process_text_message(transcription)
-                    await update.message.reply_text(response)
-                else:
-                    await update.message.reply_text("❌ Could not transcribe voice message")
-                    
-            finally:
-                # Clean up temporary file
-                if os.path.exists(temp_path):
-                    os.unlink(temp_path)
-                    
+            file = await context.bot.get_file(voice.file_id)
+            with tempfile.NamedTemporaryFile(suffix='.ogg', delete=False) as tmp:
+                await file.download_to_drive(custom_path=tmp.name)
+                voice_path = tmp.name
+            from modules.speech_recognition import SpeechRecognition
+            sr = SpeechRecognition(self.config)
+            transcription = sr.transcribe_voice_message(voice_path)
+            os.unlink(voice_path)
+            if transcription and not transcription.lower().startswith("error"):
+                resp = self.llm_manager.get_response(transcription, chat_id)
+                await update.message.reply_text(resp)
+            else:
+                await update.message.reply_text("❌ Could not transcribe voice note")
         except Exception as e:
-            logger.error(f"Error handling voice message: {e}")
-            await update.message.reply_text(f"❌ Error processing voice message: {str(e)}")
+            logger.error(f"Error handling voice: {e}")
+            await update.message.reply_text("❌ Error processing voice message")
     
-    def start(self):
-        """Start the Telegram bot"""
+    async def start(self):
         if not self.application:
             logger.error("Telegram bot not properly initialized")
             return
-        
         try:
             logger.info("Starting Telegram bot...")
-            self.application.run_polling(allowed_updates=Update.ALL_TYPES)
+            await self.application.initialize()
+            await self.application.start()
+            await self.application.updater.start_polling()
+            logger.info("✅ Telegram bot started successfully")
         except Exception as e:
             logger.error(f"Error starting Telegram bot: {e}")
+            raise
+    
+    async def stop(self):
+        if self.application:
+            try:
+                await self.application.updater.stop()
+                await self.application.stop()
+                await self.application.shutdown()
+                logger.info("Telegram bot stopped")
+            except Exception as e:
+                logger.error(f"Error stopping Telegram bot: {e}")
     
     async def send_message(self, message: str, chat_id: Optional[str] = None):
-        """Send a message to Telegram"""
+        """Send a message to a specific chat"""
         if not self.application:
             return
         
+        target_chat_id = chat_id or self.config.get('TELEGRAM_CHAT_ID')
+        if not target_chat_id:
+            return
+        
         try:
-            target_chat_id = chat_id or self.config.TELEGRAM_CHAT_ID
-            if target_chat_id:
-                await self.application.bot.send_message(chat_id=target_chat_id, text=message)
+            await self.application.bot.send_message(chat_id=target_chat_id, text=message)
         except Exception as e:
-            logger.error(f"Error sending Telegram message: {e}")
-    
-    def stop(self):
-        """Stop the Telegram bot"""
-        if self.application:
-            self.application.stop()
-            logger.info("Telegram bot stopped")
+            logger.error(f"Error sending message: {e}")
 
 
 
