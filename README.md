@@ -1,10 +1,8 @@
 🤖 AI Agent
 
 A comprehensive AI assistant that can search files, manage emails, process voice commands, and run both online (Gemini) and offline (Ollama) language models.
-<<<<<<< HEAD
 
 ✨ Features
->>>>>>> 2d66526 (Update with Gemini)
 
     🔍 File Search: Search for files across your device with natural language
     📧 Email Management: Read and send emails through Gmail integration
@@ -14,7 +12,6 @@ A comprehensive AI assistant that can search files, manage emails, process voice
     ⌨️ Hotkey Activation: Global hotkey (Ctrl+Alt+A) for voice input
     🔒 Privacy: Run completely offline with local models
 
-<<<<<<< HEAD
 - **🔍 File Search**: Search for files across your device with natural language
 - **📧 Email Management**: Read and send emails through Gmail integration
 - **🎤 Voice Recognition**: Process voice commands using Whisper.cpp
@@ -24,7 +21,6 @@ A comprehensive AI assistant that can search files, manage emails, process voice
 - **🔒 Privacy**: Run completely offline with local models
 
 🚀 Quick Start
->>>>>>> 2d66526 (Update with Gemini)
 
 Prerequisites
 
@@ -34,16 +30,8 @@ Prerequisites
     Telegram Bot Token
     Gemini API Key (for online mode)
 
-<<<<<<< HEAD
-- Python 3.8+
-- Git
-- Ollama (for offline mode)
-- Telegram Bot Token
-- Gemini API Key (for online mode)
-
 
 Installation
->>>>>>> 2d66526 (Update with Gemini)
 
     Clone the repository:
 
@@ -86,8 +74,8 @@ Create a .env file with the following variables:
 TELEGRAM_TOKEN=your_telegram_bot_token_here
 TELEGRAM_CHAT_ID=your_telegram_chat_id_here
 
-# OpenAI Configuration
-OPENAI_API_KEY=your_openai_api_key_here
+# Gemini Configuration
+GEMINI_API_KEY=your_gemini_api_key_here
 
 # Ollama Configuration (optional)
 OLLAMA_BASE_URL=http://localhost:11434
@@ -107,10 +95,10 @@ Telegram Bot
     Create a new bot with /newbot
     Get your bot token and chat ID
 
-OpenAI
+Gemini
 
-    Sign up at OpenAI
-    Get your API key from the dashboard
+    Go to Google Cloud Console
+    Get your API key 
 
 Gmail (Optional)
 
@@ -123,45 +111,13 @@ Telegram Commands
 
     /start - Initialize the bot
     /help - Show help information
-    /mode online - Switch to OpenAI
+    /mode online - Switch to Gemini
     /mode offline - Switch to Ollama
     /status - Check system status
 
-Voice Commands
-
-    Press Ctrl+Alt+A for hotkey activation
-    Send voice messages via Telegram
-    Natural language processing for all commands
-
-Text Commands
-File Operations
-
-    "Search for documents"
-    "Find all PDF files"
-    "Look for my photos"
-
-Email Operations
-
-    "Check emails"
-    "Search email from John"
-    "Show recent emails"
-
-System Commands
-
-    "Switch to online mode"
-    "Switch to offline mode"
-    "System status"
-    "Help"
 
 🏗️ Architecture
 
-<<<<<<< HEAD
->>>>>>> 252d052 (Add comprehensive AI agent with Telegram bot, OpenAI/HuggingFace integration, file search, and voice recognition)
-## 🏗️ Architecture
-
-```
-=======
->>>>>>> 2d66526 (Update with Gemini)
 AI Agent
 ├── LLM Manager (Gemini/Ollama)
 ├── Speech Recognition (Whisper.cpp)
@@ -178,7 +134,6 @@ Modules
     email_manager.py: Gmail API integration
     telegram_bot.py: Telegram bot interface
     hotkey_manager.py: Global hotkey management
->>>>>>> 2d66526 (Update with Gemini)
 
 🔧 Development
 Project Structure
@@ -252,7 +207,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
     Ollama for local LLM inference
     Gemini for GPT models
     python-telegram-bot for Telegram integration
->>>>>>> 2d66526 (Update with Gemini)
 
 📞 Support
 
@@ -263,8 +217,6 @@ If you encounter any issues or have questions:
     Open an issue on GitHub
     Check the documentation
 
-<<<<<<< HEAD
----
 
 **ENJOY**
 
