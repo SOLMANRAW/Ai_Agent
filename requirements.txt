@@ -1,5 +1,4 @@
 requests
-openai
 python-telegram-bot
 pynput
 sounddevice

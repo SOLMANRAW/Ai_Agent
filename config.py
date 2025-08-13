@@ -22,7 +22,7 @@ class Config:
     GMAIL_TOKEN_FILE = os.getenv('GMAIL_TOKEN_FILE', 'token.json')
     
     # Whisper Configuration
-    WHISPER_MODEL_PATH = os.getenv('WHISPER_MODEL_PATH', 'whisper.cpp/models/ggml-large-v3-turbo-q5_0.bin')
+    WHISPER_MODEL_PATH = os.getenv('WHISPER_MODEL_PATH', 'models/ggml-large-v3-turbo-q5_0.bin')
     WHISPER_CPP_PATH = os.getenv('WHISPER_CPP_PATH', './whisper.cpp')
     WHISPER_EXECUTABLE = os.getenv('WHISPER_EXECUTABLE', './whisper.cpp/build/bin/whisper-cli')
     
@@ -50,22 +50,21 @@ class Config:
     AUDIO_FORMAT = "wav"
     
     def get(self, key, default=None):
-        """Get configuration value with optional default"""
+        # Get configuration value with optional default
         return getattr(self, key, default)
-    
+
     @classmethod
     def validate(cls):
-        """Validate that all required configuration is present"""
+        # Validate that all required configuration is present
         required_vars = [
             'TELEGRAM_TOKEN'
         ]
-        
         missing_vars = []
         for var in required_vars:
             if not getattr(cls, var):
                 missing_vars.append(var)
-        
         if missing_vars:
-            raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
-        
+            raise ValueError(
+                f"Missing required environment variables: {', '.join(missing_vars)}"
+            )
         return True

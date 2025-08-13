@@ -5,7 +5,6 @@ AI Agent Launcher
 
 import sys
 import os
-import logging
 from pathlib import Path
 
 # Add the current directory to Python path

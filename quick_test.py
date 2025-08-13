@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-"""
-Quick test to check AI Agent setup status
-"""
+
+# Quick test to check AI Agent setup status
+
 
 import os
 import sys
 
 def test_imports():
     """Test if required packages can be imported"""
-    print("🔧 Testing imports...")
+    print("Testing imports...")
     
     packages = [
         ('requests', 'requests'),
-        ('openai', 'openai'),
         ('telegram', 'python-telegram-bot'),
         ('pynput', 'pynput'),
         ('sounddevice', 'sounddevice'),
@@ -23,39 +22,35 @@ def test_imports():
     for module_name, package_name in packages:
         try:
             __import__(module_name)
-            print(f"✅ {package_name}")
+            print(f"{package_name}")
         except ImportError:
-            print(f"❌ {package_name} - MISSING")
+            print(f"{package_name} - MISSING")
     
     print()
 
 def test_config():
     """Test configuration loading"""
-    print("⚙️ Testing configuration...")
+    print("Testing configuration...")
     try:
         from config import Config
         config = Config()
-        print("✅ Configuration loaded")
+        print("Configuration loaded")
         
         # Check key settings
         if config.TELEGRAM_TOKEN:
-            print("✅ Telegram token set")
+            print("Telegram token set")
         else:
-            print("❌ Telegram token missing")
+            print("Telegram token missing")
             
-        if config.OPENAI_API_KEY:
-            print("✅ OpenAI API key set")
-        else:
-            print("❌ OpenAI API key missing")
-            
+                    
     except Exception as e:
-        print(f"❌ Configuration error: {e}")
+        print(f"Configuration error: {e}")
     
     print()
 
 def test_whisper():
-    """Test Whisper setup"""
-    print("🎤 Testing Whisper.cpp...")
+    #Test Whisper setup
+    print("Testing Whisper.cpp...")
     
     try:
         from config import Config
@@ -63,24 +58,24 @@ def test_whisper():
         
         # Check executable
         if os.path.exists(config.WHISPER_EXECUTABLE):
-            print("✅ Whisper executable found")
+            print("Whisper executable found")
         else:
-            print(f"❌ Whisper executable not found: {config.WHISPER_EXECUTABLE}")
+            print(f"Whisper executable not found: {config.WHISPER_EXECUTABLE}")
         
         # Check model
         if os.path.exists(config.WHISPER_MODEL_PATH):
-            print("✅ Whisper model found")
+            print("Whisper model found")
         else:
-            print(f"❌ Whisper model not found: {config.WHISPER_MODEL_PATH}")
+            print(f"Whisper model not found: {config.WHISPER_MODEL_PATH}")
             
     except Exception as e:
-        print(f"❌ Whisper test error: {e}")
+        print(f"Whisper test error: {e}")
     
     print()
 
 def test_ollama():
-    """Test Ollama setup"""
-    print("🤖 Testing Ollama...")
+    #Test Ollama setup
+    print("Testing Ollama...")
     
     try:
         import requests
@@ -88,19 +83,19 @@ def test_ollama():
         if response.status_code == 200:
             models = response.json().get("models", [])
             if any("mistral" in model.get("name", "") for model in models):
-                print("✅ Ollama running with Mistral model")
+                print("Ollama running with Mistral model")
             else:
-                print("⚠️ Ollama running but Mistral model not found")
+                print("Ollama running but Mistral model not found")
         else:
-            print("❌ Ollama API not responding")
+            print("Ollama API not responding")
     except Exception as e:
-        print(f"❌ Ollama not running: {e}")
+        print(f"Ollama not running: {e}")
     
     print()
 
 def main():
-    """Run all tests"""
-    print("🤖 AI Agent Quick Test")
+    #Run all tests
+    print("AI Agent Quick Test")
     print("=" * 30)
     
     test_imports()
@@ -108,7 +103,7 @@ def main():
     test_whisper()
     test_ollama()
     
-    print("🎯 Test completed!")
+    print("Test completed!")
     print("\nNext steps:")
     print("1. Install Ollama: https://ollama.ai")
     print("2. Pull Mistral model: ollama pull mistral:7b")

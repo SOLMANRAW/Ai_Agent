@@ -6,8 +6,7 @@ Simplified AI Agent without Gmail for testing
 import asyncio
 import logging
 import re
-from typing import Dict, Any, Optional
-import threading
+from typing import Optional
 
 from config import Config
 from modules.llm_manager import LLMManager
@@ -177,31 +176,31 @@ class AIAgentSimple:
         status_parts = []
         
         # LLM Status
-        llm_status = f"🤖 LLM: {self.llm_manager.current_mode.upper()}"
+        llm_status = f"LLM: {self.llm_manager.current_mode.upper()}"
         status_parts.append(llm_status)
         
         # Whisper Status
-        whisper_status = "🎤 Whisper: ✅ Available" if self.speech_recognition.is_whisper_available() else "🎤 Whisper: ❌ Not available"
+        whisper_status = "Whisper: Available" if self.speech_recognition.is_whisper_available() else "Whisper: Not available"
         status_parts.append(whisper_status)
         
         # Hotkey Status
-        hotkey_status = "⌨️ Hotkey: ✅ Active" if self.hotkey_manager.is_listening() else "⌨️ Hotkey: ❌ Inactive"
+        hotkey_status = "Hotkey: Active" if self.hotkey_manager.is_listening() else "Hotkey: Inactive"
         status_parts.append(hotkey_status)
         
         # Telegram Status
-        telegram_status = "📱 Telegram: ✅ Active" if self.telegram_bot.application else "📱 Telegram: ❌ Inactive"
+        telegram_status = "Telegram: Active" if self.telegram_bot.application else "Telegram: Inactive"
         status_parts.append(telegram_status)
         
         # Hotkey combination
         hotkey_combo = self.hotkey_manager.get_current_combination()
-        status_parts.append(f"🔑 Hotkey: {hotkey_combo}")
+        status_parts.append(f"Hotkey: {hotkey_combo}")
         
         return "\n".join(status_parts)
     
     def _get_help_message(self) -> str:
         """Get help message"""
         return (
-            "🤖 **AI Assistant Help**\n\n"
+            "**AI Assistant Help**\n\n"
             "**File Operations:**\n"
             "• 'Search for [filename]' - Find files\n"
             "• 'Find all PDF files' - Search by type\n"
